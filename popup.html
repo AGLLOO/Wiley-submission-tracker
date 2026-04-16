@@ -16,8 +16,11 @@
     .time { color: #6b7280; font-size: 11px; margin-bottom: 4px; }
     .button { background: #1e3a5f; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .button:hover { background: #2c5282; }
+    .button-secondary { background: #4b5563; }
+    .button-secondary:hover { background: #374151; }
     input { width: calc(100% - 80px); padding: 6px; margin: 4px 0; box-sizing: border-box; }
     .info { font-size: 11px; color: #6b7280; margin-top: 8px; }
+    .error { background: #fee2e2; border-left: 3px solid #ef4444; padding: 6px; margin: 8px 0; font-size: 12px; color: #b91c1c; }
   </style>
   <script src="popup.js" defer></script>
 </head>
@@ -27,6 +30,7 @@
     <span id="updateBadge" class="update-badge">新版</span>
   </div>
   <div id="updateMessage" class="update-message"></div>
+  <div id="errorMessage" class="error" style="display: none;"></div>
 
   <div class="field">
     <div class="label">当前监控稿件 ID</div>
@@ -35,6 +39,10 @@
   <div>
     <input type="text" id="manualId" placeholder="或手动输入稿件 ID">
     <button id="setIdBtn" class="button">设置</button>
+  </div>
+
+  <div style="display: flex; gap: 8px; margin-top: 8px;">
+    <button id="refreshBtn" class="button button-secondary" style="flex:1;">🔄 立即检查</button>
   </div>
 
   <div class="field">
@@ -76,7 +84,8 @@
   </div>
   <div class="info">
     💡 自动检测：打开稿件页面后点击插件图标，会自动识别稿件 ID。<br>
-    🔔 任何字段变化都会立即通知并记录。
+    🔔 任何字段变化都会立即通知并记录。<br>
+    🔄 点击“立即检查”手动获取最新状态。
   </div>
 </body>
 </html>

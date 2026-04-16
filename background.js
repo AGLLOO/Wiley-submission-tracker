@@ -71,7 +71,6 @@ async function loadSubmissionData(submissionId) {
       changeHistory: data.changeHistory
     };
   } else {
-    // 新稿件，初始化空数据
     currentData = {
       lastData: {
         state: null,
@@ -136,8 +135,8 @@ async function updateStatus(newData) {
 // 主动获取 API 数据
 async function fetchStatus() {
   if (!currentSubmissionId) {
-    console.log('[BG] 未设置稿件 ID，跳过轮询');
-    return;
+    console.log('[BG] 未设置稿件 ID，跳过获取');
+    return { success: false, error: '未设置稿件 ID' };
   }
   try {
     const allCookies = await chrome.cookies.getAll({ url: 'https://submission.wiley.com' });
@@ -152,32 +151,44 @@ async function fetchStatus() {
     const data = await response.json();
     console.log(`[BG] 获取到稿件 ${currentSubmissionId} 数据`, data);
     await updateStatus(data);
+    return { success: true };
   } catch (error) {
     console.error('[BG] 请求失败', error);
+    return { success: false, error: error.message };
   }
 }
 
-// 切换稿件 ID
+// 切换稿件 ID（允许 null 清除监控）
 async function setSubmissionId(id) {
   if (currentSubmissionId === id) return;
-  // 保存当前稿件数据
   if (currentSubmissionId) {
     await saveCurrentData();
   }
   currentSubmissionId = id;
-  await loadSubmissionData(id);
-  console.log(`[BG] 切换到稿件 ${id}`);
-  await chrome.storage.local.set({ currentSubmissionId: id });
-  await fetchStatus(); // 立即获取新稿件状态
-}
-
-// 定时轮询（每 5 分钟）
-chrome.alarms.create('fetchStatus', { periodInMinutes: 5 });
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'fetchStatus') {
-    fetchStatus();
+  if (id === null) {
+    // 清除监控
+    currentData = {
+      lastData: {
+        state: null,
+        workflowState: null,
+        workflow: null,
+        decisionDate: null,
+        rxScreeningResult: null,
+        lastStateChangeDate: null,
+        modified: null,
+        cycleNumber: null
+      },
+      changeHistory: []
+    };
+    await chrome.storage.local.remove('currentSubmissionId');
+    console.log('[BG] 已清除稿件监控');
+  } else {
+    await loadSubmissionData(id);
+    console.log(`[BG] 切换到稿件 ${id}`);
+    await chrome.storage.local.set({ currentSubmissionId: id });
+    await fetchStatus(); // 切换后自动获取一次
   }
-});
+}
 
 // 消息监听（来自 popup）
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -207,6 +218,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     }).catch(err => sendResponse({}));
     return true;
+  } else if (message.action === 'refresh') {
+    // 手动刷新
+    fetchStatus().then(result => {
+      sendResponse(result);
+    }).catch(err => sendResponse({ success: false, error: err.message }));
+    return true;
   }
 });
 
@@ -218,5 +235,5 @@ chrome.storage.local.get(['currentSubmissionId']).then(result => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[BG] 多稿件版扩展已安装');
+  console.log('[BG] 无轮询版扩展已安装');
 });
