@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 400px; padding: 12px; font-family: system-ui, 'Segoe UI', sans-serif; margin: 0; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    h3 { margin: 0; font-size: 16px; color: #1e3a5f; }
+    .update-badge { display: none; background: #ef4444; color: white; border-radius: 20px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
+    .update-message { display: none; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 6px; margin: 0 0 8px 0; font-size: 12px; border-radius: 4px; }
+    .field { margin: 8px 0; }
+    .label { font-size: 12px; color: #4b5563; margin-bottom: 2px; }
+    .value { font-weight: 600; font-size: 14px; color: #1f2937; word-break: break-word; }
+    .history { margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 8px; }
+    .history-item { font-size: 12px; margin: 8px 0; padding: 6px; background: #f5f7fa; border-radius: 6px; }
+    .time { color: #6b7280; font-size: 11px; margin-bottom: 4px; }
+    .button { background: #1e3a5f; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .button:hover { background: #2c5282; }
+    input { width: calc(100% - 80px); padding: 6px; margin: 4px 0; box-sizing: border-box; }
+    .info { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  </style>
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <div class="header">
+    <h3>📊 稿件状态详情</h3>
+    <span id="updateBadge" class="update-badge">新版</span>
+  </div>
+  <div id="updateMessage" class="update-message"></div>
+
+  <div class="field">
+    <div class="label">当前监控稿件 ID</div>
+    <div class="value" id="currentId">--</div>
+  </div>
+  <div>
+    <input type="text" id="manualId" placeholder="或手动输入稿件 ID">
+    <button id="setIdBtn" class="button">设置</button>
+  </div>
+
+  <div class="field">
+    <div class="label">State</div>
+    <div class="value" id="state">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Workflow State</div>
+    <div class="value" id="workflowState">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Workflow</div>
+    <div class="value" id="workflow">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Decision Date</div>
+    <div class="value" id="decisionDate">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Screening Result</div>
+    <div class="value" id="rxScreeningResult">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Last State Change Date</div>
+    <div class="value" id="lastStateChangeDate">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Last Modified</div>
+    <div class="value" id="modified">--</div>
+  </div>
+  <div class="field">
+    <div class="label">Cycle Number</div>
+    <div class="value" id="cycleNumber">--</div>
+  </div>
+
+  <div class="history">
+    <div class="label">📋 最近变化记录</div>
+    <div id="historyList"></div>
+  </div>
+  <div class="info">
+    💡 自动检测：打开稿件页面后点击插件图标，会自动识别稿件 ID。<br>
+    🔔 任何字段变化都会立即通知并记录。
+  </div>
+</body>
+</html>

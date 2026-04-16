@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "稿件状态跟踪器",
+  "version": "3.2",
+  "description": "自动检测稿件，监控状态字段变化，支持多稿件独立存储",
+  "permissions": [
+    "storage",
+    "notifications",
+    "alarms",
+    "cookies",
+    "tabs"
+  ],
+"host_permissions": [
+  "https://submission.wiley.com/*",
+  "https://gist.githubusercontent.com/*"
+],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "稿件状态跟踪器"
+  }
+}
